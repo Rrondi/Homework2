@@ -1,0 +1,41 @@
+{
+    "students": [
+        {
+            "id": "1",
+            "name": "Rron"
+        },
+        {
+            "id": "2",
+            "name": "John Doe"
+        }
+    ],
+    "courses": [
+        {
+            "code": "CS101",
+            "title": "Intro"
+        },
+        {
+            "code": "Python Fundamentals",
+            "title": "Loops"
+        }
+    ],
+    "enrollments": [
+        {
+            "student_id": "1",
+            "course_code": "CS101",
+            "grades": [
+                65.0
+            ]
+        },
+        {
+            "student_id": "2",
+            "course_code": "CS101",
+            "grades": []
+        },
+        {
+            "student_id": "2",
+            "course_code": "Python Fundamentals",
+            "grades": []
+        }
+    ]
+}
