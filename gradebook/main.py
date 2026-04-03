@@ -1,5 +1,52 @@
 import argparse
+import logging
+import os
 from gradebook.service import GradebookService
+
+
+# get project root (directory of main.py)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# create logs folder at root
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+
+LOG_FILE = os.path.join(LOG_DIR, "app.log")
+
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+
+def parse_student_id(value):
+    if not value:
+        raise ValueError("Student ID cannot be empty")
+
+    if not str(value).isdigit():
+        raise ValueError("Student ID must be a number")
+
+    return str(value)
+
+
+def parse_course_code(value):
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError("Course code must be a non-empty string")
+
+    return value.strip()
+
+
+def parse_grade(value):
+    try:
+        grade = float(value)
+    except:
+        raise ValueError("Grade must be a number")
+
+    if grade < 0 or grade > 100:
+        raise ValueError("Grade must be between 0 and 100")
+
+    return grade
 
 
 def main():
@@ -57,22 +104,39 @@ def main():
 
     try:
         if args.command == "add-student":
-            student_id = service.add_student(args.name)
+            name = args.name.strip()
+            if not name:
+                raise ValueError("Student name cannot be empty")
+
+            student_id = service.add_student(name)
             print(f"Student added successfully with ID {student_id}.")
 
         elif args.command == "add-course":
-            service.add_course(args.code, args.title)
-            print(f"Course '{args.code} - {args.title}' added successfully.")
+            code = parse_course_code(args.code)
+            title = args.title.strip()
+
+            if not title:
+                raise ValueError("Course title cannot be empty")
+
+            service.add_course(code, title)
+            print(f"Course '{code} - {title}' added successfully.")
 
         elif args.command == "enroll":
-            service.enroll(args.student_id, args.course)
+            student_id = parse_student_id(args.student_id)
+            course_code = parse_course_code(args.course)
+
+            service.enroll(student_id, course_code)
             print(
-                f"Student {args.student_id} enrolled in course {args.course} successfully.")
+                f"Student {student_id} enrolled in course {course_code} successfully.")
 
         elif args.command == "add-grade":
-            service.add_grade(args.student_id, args.course, args.grade)
+            student_id = parse_student_id(args.student_id)
+            course_code = parse_course_code(args.course)
+            grade = parse_grade(args.grade)
+
+            service.add_grade(student_id, course_code, grade)
             print(
-                f"Grade {args.grade} added for student {args.student_id} in course {args.course}."
+                f"Grade {grade} added for student {student_id} in course {course_code}."
             )
 
         elif args.command == "list":
@@ -117,20 +181,27 @@ def main():
                         )
 
         elif args.command == "avg":
-            average = service.compute_average(args.student_id, args.course)
+            student_id = parse_student_id(args.student_id)
+            course_code = parse_course_code(args.course)
+
+            average = service.compute_average(student_id, course_code)
             print(
-                f"Average for student {args.student_id} in course {args.course}: "
+                f"Average for student {student_id} in course {course_code}: "
                 f"{average:.2f}"
             )
 
         elif args.command == "gpa":
-            gpa = service.compute_gpa(args.student_id)
-            print(f"GPA for student {args.student_id}: {gpa:.2f}")
+            student_id = parse_student_id(args.student_id)
+
+            gpa = service.compute_gpa(student_id)
+            print(f"GPA for student {student_id}: {gpa:.2f}")
 
     except ValueError as e:
+        logging.error(f"Validation error: {e}")
         print(f"Error: {e}")
 
     except Exception as e:
+        logging.error(f"Unexpected error: {e}")
         print(f"Unexpected error: {e}")
 
 

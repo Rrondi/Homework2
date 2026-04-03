@@ -6,22 +6,28 @@ class GradebookService:
     def __init__(self, path="data/gradebook.json"):
         self.path = path
         self.data = load_data(self.path)
+
     # Instead of checking for the existence of students, courses, and enrollments
     # in multiple places I wrote some helper functions
-
     def _find_student(self, student_id):
+        """Helper function to find a student by Id."""
+
         for student in self.data["students"]:
             if student["id"] == str(student_id):
                 return student
         return None
 
     def _find_course(self, course_code):
+        """Helper function to find a course by code."""
+
         for course in self.data["courses"]:
             if course["code"] == course_code:
                 return course
         return None
 
     def _find_enrollment(self, student_id, course_code):
+        """Helper function to find an enrollment by student Id and course code."""
+
         for enrollment in self.data["enrollments"]:
             if (
                 enrollment["student_id"] == str(student_id)
@@ -31,6 +37,7 @@ class GradebookService:
         return None
 
     def _generate_student_id(self):
+        """Helper function to generate a unique student Id."""
         max_id = 0
 
         for student in self.data["students"]:
@@ -42,6 +49,8 @@ class GradebookService:
         return str(max_id + 1)
 
     def add_student(self, name):
+        """Adds a new student and returns the generated student Id."""
+
         student_id = self._generate_student_id()
         student = Student(student_id, name)
 
@@ -54,6 +63,8 @@ class GradebookService:
         return student.id
 
     def add_course(self, code, title):
+        """Adds a new course."""
+
         if self._find_course(code):
             raise ValueError(f"Course with code '{code}' already exists")
 
@@ -67,6 +78,8 @@ class GradebookService:
         save_data(self.data, self.path)
 
     def enroll(self, student_id, course_code):
+        """Enrolls a student in a course."""
+
         if not self._find_student(student_id):
             raise ValueError(f"Student with id '{student_id}' does not exist")
 
@@ -88,6 +101,7 @@ class GradebookService:
         save_data(self.data, self.path)
 
     def add_grade(self, student_id, course_code, grade):
+        """Adds a grade to a student's course."""
         if not isinstance(grade, (int, float)):
             raise ValueError("Grade must be numeric")
 
@@ -102,6 +116,8 @@ class GradebookService:
         save_data(self.data, self.path)
 
     def list_students(self):
+        """Returns a list of all students."""
+
         students = []
 
         for student in self.data["students"]:
@@ -110,6 +126,8 @@ class GradebookService:
         return sorted(students, key=lambda s: s.name.lower())
 
     def list_courses(self):
+        """Returns a list of all courses."""
+
         courses = []
 
         for course in self.data["courses"]:
@@ -118,6 +136,8 @@ class GradebookService:
         return sorted(courses, key=lambda c: c.code.lower())
 
     def list_enrollments(self):
+        """Returns a list of all enrollments."""
+
         enrollments = []
 
         for enrollment in self.data["enrollments"]:
@@ -132,6 +152,8 @@ class GradebookService:
         return sorted(enrollments, key=lambda e: (e.student_id, e.course_code.lower()))
 
     def compute_average(self, student_id, course_code):
+        """Computes the average grade for a student in a course."""
+
         enrollment = self._find_enrollment(student_id, course_code)
 
         if not enrollment:
@@ -145,6 +167,8 @@ class GradebookService:
         return sum(grades) / len(grades)
 
     def compute_gpa(self, student_id):
+        """Computes the GPA for a student across all courses."""
+
         student_enrollments = []
 
         for enrollment in self.data["enrollments"]:

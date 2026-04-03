@@ -1,5 +1,8 @@
 class Student:
+    """Represents a student with ID and name."""
+
     def __init__(self, id, name):
+        """Initialize a student and check validation."""
         if not id:
             raise ValueError("Id cannot be empty")
         if not isinstance(name, str) or not name.strip():
@@ -13,6 +16,8 @@ class Student:
 
 
 class Course:
+    """Represents a course with code and title."""
+
     def __init__(self, code, title):
         if not isinstance(code, str) or not code.strip():
             raise ValueError("Course code must be a non-empty string")
@@ -27,7 +32,9 @@ class Course:
 
 
 class Enrollment:
+    """Represents an enrollment of a student in a course, with grades."""
     # grades is None because a student might not have a grade
+
     def __init__(self, student_id, course_code, grades=None):
         if not student_id:
             raise ValueError("Student ID cannot be empty")
