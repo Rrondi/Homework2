@@ -9,7 +9,7 @@ A simple Python CLI application to manage students, courses, enrollments, and gr
 ### 1. Clone / Download the project
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Rrondi/Homework2
 cd gradebook
 ```
 
